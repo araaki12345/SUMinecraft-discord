@@ -1,4 +1,4 @@
-class Member{
+export class Member{
     id:string;
     name:string;
     email:string;
@@ -13,5 +13,8 @@ class Member{
 
     authorise(){
         this.isAuthorised = true;
+    }
+    setEmail(newEmail: string){
+        this.email = newEmail;
     }
 }
