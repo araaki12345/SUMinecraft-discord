@@ -1,7 +1,7 @@
 import { Member } from "../entities/Member";
 import { MemberRepository } from "../interfaces/MemberRepository";
 
-class AuthenticationUseCase {
+export class AuthenticationUseCase {
   private memberRepository: MemberRepository;
 
   constructor(memberRepository: MemberRepository) {
