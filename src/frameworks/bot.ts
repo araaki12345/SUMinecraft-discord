@@ -1,6 +1,9 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import { AuthenticationUseCase } from "../usecases/AuthenticationUseCase";
 import { InMemoryMemberRepository } from "../interfaces/InMemoryMemberRepository";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const client = new Client({
   intents: [
