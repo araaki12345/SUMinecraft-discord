@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import { AuthenticationUseCase } from "../usecases/AuthenticationUseCase";
-import { InMemoryMemberRepository } from "../interfaces/InMemoryMemberRepository";
+import { handleAuthCommand } from "../commands/authCommandHandler.js";
+import { InMemoryMemberRepository } from "../interfaces/InMemoryMemberRepository.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -12,6 +13,14 @@ const client = new Client({
     GatewayIntentBits.MessageContent, // メッセージ内容を受信するためにはこのインテントが必要
     GatewayIntentBits.DirectMessages,
   ],
+});
+
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isCommand()) return;
+  if (interaction.commandName === "auth") {
+    const memberRepository = InMemoryMemberRepository.getInstance();
+    await handleAuthCommand(interaction, memberRepository);
+  }
 });
 
 client.on("ready", () => {
