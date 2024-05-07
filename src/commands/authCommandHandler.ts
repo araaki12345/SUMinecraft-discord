@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import { MemberRepository } from "../interfaces/MemberRepository";
-import { AuthService } from "../commands/auth";
+import { AuthService } from "./auth.js";
 
 export async function handleAuthCommand(
   interaction: CommandInteraction,

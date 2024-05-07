@@ -1,4 +1,4 @@
-import { Member } from "../entities/Member";
+import { Member } from "../entities/Member.js";
 
 export interface MemberRepository {
   save(member: Member): Promise<void>;

@@ -1,5 +1,5 @@
 import { Member } from "../entities/Member";
-import { MemberRepository } from "../interfaces/MemberRepository";
+import { MemberRepository } from "../interfaces/MemberRepository.js";
 
 export class AuthenticationUseCase {
   private memberRepository: MemberRepository;

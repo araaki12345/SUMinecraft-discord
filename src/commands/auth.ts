@@ -1,5 +1,5 @@
-import { MemberRepository } from "../interfaces/MemberRepository";
-import { Member } from "../entities/Member";
+import { MemberRepository } from "../interfaces/MemberRepository.js";
+import { Member } from "../entities/Member.js";
 
 export class AuthService {
   private memberRepository: MemberRepository;
