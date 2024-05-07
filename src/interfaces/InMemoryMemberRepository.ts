@@ -1,11 +1,28 @@
 import { Member } from "../entities/Member";
-import { MemberRepository } from "./MemberRepository";
+import { MemberRepository } from "./MemberRepository.js";
 
 export class InMemoryMemberRepository implements MemberRepository {
+  private static instance: InMemoryMemberRepository;
   private members: Member[] = [];
 
+  private constructor() {}
+
+  public static getInstance(): InMemoryMemberRepository {
+    if (!InMemoryMemberRepository.instance) {
+      InMemoryMemberRepository.instance = new InMemoryMemberRepository();
+    }
+    return InMemoryMemberRepository.instance;
+  }
+
   async findById(id: string): Promise<Member | null> {
-    return this.members.find((member) => member.id === id) || null;
+    console.log(`Searching for member with ID: ${id}`);
+    const member = this.members.find((member) => member.id === id);
+    if (!member) {
+      console.log("Member not found.");
+    } else {
+      console.log(`Member found: ${member.id}`);
+    }
+    return member || null;
   }
 
   async save(member: Member): Promise<void> {
