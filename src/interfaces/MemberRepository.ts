@@ -6,4 +6,5 @@ export interface MemberRepository {
   delete(member: Member): Promise<void>;
   findById(id: string): Promise<Member | null>;
   findByEmail(email: string): Promise<Member | null>;
+  sendMessage(id: string, message: string): Promise<void>;
 }
