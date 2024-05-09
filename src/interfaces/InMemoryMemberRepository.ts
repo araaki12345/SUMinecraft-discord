@@ -1,15 +1,19 @@
+import { Client } from "discord.js";
 import { Member } from "../entities/Member";
 import { MemberRepository } from "./MemberRepository.js";
 
 export class InMemoryMemberRepository implements MemberRepository {
   private static instance: InMemoryMemberRepository;
+  private client: Client;
   private members: Member[] = [];
 
-  private constructor() {}
+  private constructor(client: Client) {
+    this.client = client;
+  }
 
-  public static getInstance(): InMemoryMemberRepository {
+  public static getInstance(client: Client): InMemoryMemberRepository {
     if (!InMemoryMemberRepository.instance) {
-      InMemoryMemberRepository.instance = new InMemoryMemberRepository();
+      InMemoryMemberRepository.instance = new InMemoryMemberRepository(client);
     }
     return InMemoryMemberRepository.instance;
   }
@@ -48,5 +52,14 @@ export class InMemoryMemberRepository implements MemberRepository {
 
   async findByEmail(email: string): Promise<Member | null> {
     return this.members.find((member) => member.email === email) || null;
+  }
+  async sendMessage(memberId: string, message: string): Promise<void> {
+    try {
+      const user = await this.client.users.fetch(memberId);
+      await user.send(message);
+      console.log(`Message successfully sent to ${memberId}: ${message}`);
+    } catch (error) {
+      console.error(`Failed to send message to ${memberId}: ${error}`);
+    }
   }
 }
