@@ -1,6 +1,9 @@
 import { Member } from "../entities/Member.js";
 import { MemberRepository } from "../interfaces/MemberRepository.js";
+import { sendAuthenticationLink } from "../services/authservice.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 export class AuthenticationUseCase {
   private memberRepository: MemberRepository;
 
@@ -23,9 +26,15 @@ export class AuthenticationUseCase {
         member.setEmail(email);
         member.authorise();
         await this.memberRepository.update(member);
+        const redirectUrl = process.env.REDIRECT_URL;
+        if (!redirectUrl) {
+          throw new Error("Redirect URL is not set.");
+          return;
+        }
+        await sendAuthenticationLink(email, redirectUrl);
         await this.memberRepository.sendMessage(
           memberId,
-          "Your email has been verified. Welcome!"
+          "認証リンクをメールに送信しました。メールを確認してください。"
         );
       }
     } else {

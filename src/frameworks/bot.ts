@@ -60,12 +60,23 @@ client.on("guildMemberAdd", async (member) => {
 });
 
 client.on("messageCreate", async (message) => {
-  if (message.author.bot || !message.guild) return; // ボットからのメッセージやDM以外は無視
-  if (
-    message.channel.type === ChannelType.DM &&
-    message.content.includes("@shizuoka.ac.jp")
-  ) {
-    await authUseCase.handleEmailResponse(message.author.id, message.content);
+  console.log(
+    "Received a message:",
+    message.content,
+    "Channel type:",
+    message.channel.type
+  );
+  if (message.author.bot) return; // ボットからのメッセージやDM以外は無視
+  if (!message.guild && message.channel.type === ChannelType.DM) {
+    const emailRegex = /[\w.-]+@shizuoka\.ac\.jp$/i; // メールアドレスの正規表現
+    const emailMatch = message.content.match(emailRegex);
+    if (emailMatch) {
+      console.log(`Received email: ${emailMatch[0]}`);
+      await authUseCase.handleEmailResponse(message.author.id, emailMatch[0]);
+    } else {
+      console.log("Received invalid or no email address.");
+      await message.reply("有効な静岡大学のメールアドレスを入力してください。");
+    }
   }
 });
 
