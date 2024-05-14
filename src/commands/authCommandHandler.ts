@@ -13,5 +13,11 @@ export async function handleAuthCommand(
     const result = await authService.authenticateMember(interaction.user.id);
     await interaction.reply(result);
     // ロール管理などの追加処理もここに含める
+    const guild = interaction.guild;
+    if (guild) {
+      await authService.grantAuthorisedRole(interaction.user.id, guild);
+    } else {
+      console.log("ギルドが見つかりません。");
+    }
   }
 }
