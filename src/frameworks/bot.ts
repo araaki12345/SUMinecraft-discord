@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits, ChannelType } from "discord.js";
 import { AuthenticationUseCase } from "../usecases/AuthenticationUseCase.js";
 import { handleAuthCommand } from "../commands/authCommandHandler.js";
 import { InMemoryMemberRepository } from "../interfaces/InMemoryMemberRepository.js";
+import { AuthService } from "../commands/auth.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -18,13 +19,7 @@ const client = new Client({
 
 const memberRepository = InMemoryMemberRepository.getInstance(client);
 const authUseCase = new AuthenticationUseCase(memberRepository);
-
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isCommand()) return;
-  if (interaction.commandName === "auth") {
-    await handleAuthCommand(interaction, memberRepository);
-  }
-});
+const authService = new AuthService(memberRepository);
 
 client.on("ready", () => {
   if (client.user) {
@@ -34,27 +29,16 @@ client.on("ready", () => {
   }
 });
 
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isCommand()) return;
+  if (interaction.commandName === "auth") {
+    await handleAuthCommand(interaction, memberRepository);
+  }
+});
+
 client.on("guildMemberAdd", async (member) => {
-  console.log(`New member added:" ${member.user.tag}`);
-  let unaurhorizedRole = member.guild.roles.cache.find(
-    (role) => role.name === "Unauthorized"
-  );
-  if (!unaurhorizedRole) {
-    try {
-      unaurhorizedRole = await member.guild.roles.create({
-        name: "未認証",
-        color: "Grey",
-        reason: "未認証ユーザー用のロール",
-      });
-      console.log("未認証ロールの作成に成功");
-    } catch (error) {
-      console.error("未認証ロールの作成に失敗", error);
-    }
-  }
-  if (unaurhorizedRole) {
-    member.roles.add(unaurhorizedRole);
-    console.log(`未認証ロールが ${member.user.tag}に付与されました。`);
-  }
+  console.log(`New member added: ${member.user.tag}`);
+  await authService.addUnauthorizedRole(member);
   await authUseCase.handleNewMember(member.id);
   console.log(`Sent a welcome message to ${member.user.tag}.`);
 });
