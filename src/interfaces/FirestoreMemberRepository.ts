@@ -42,13 +42,18 @@ export class FirestoreMemberRepository implements MemberRepository {
   }
 
   async save(member: Member): Promise<void> {
-    await setDoc(doc(this.collectionRef, member.getId()), {
-      id: member.getId(),
-      email: member.getEmail(),
-      isAuthorised: member.isAuthorised(),
-    });
+    console.log(`Attempting to save member with ID: ${member.getId()}`);
+    try {
+      await setDoc(doc(this.collectionRef, member.getId()), {
+        id: member.getId(),
+        email: member.getEmail(),
+        isAuthorised: member.isAuthorised(),
+      });
+      console.log(`Member ${member.getId()} saved.`);
+    } catch (error) {
+      console.error(`Failed to save member ${member.getId()}: ${error}`);
+    }
   }
-
   async delete(id: string): Promise<void> {
     await deleteDoc(doc(this.collectionRef, id));
   }
@@ -64,9 +69,14 @@ export class FirestoreMemberRepository implements MemberRepository {
   }
 
   async update(member: Member): Promise<void> {
-    await updateDoc(doc(this.collectionRef, member.getId()), {
-      email: member.getEmail(),
-      isAuthorised: member.isAuthorised(),
-    });
+    try {
+      await updateDoc(doc(this.collectionRef, member.getId()), {
+        email: member.getEmail(),
+        isAuthorised: member.isAuthorised(),
+      });
+      console.log(`Member ${member.getId()} updated.`);
+    } catch (error) {
+      console.error(`Failed to update member ${member.getId()}: ${error}`);
+    }
   }
 }
