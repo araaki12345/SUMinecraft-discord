@@ -1,8 +1,13 @@
-import { Client, GatewayIntentBits, ChannelType } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  ChannelType,
+  ActivityType,
+} from "discord.js";
 import { AuthenticationUseCase } from "../usecases/AuthenticationUseCase.js";
 import { handleAuthCommand } from "../commands/authCommandHandler.js";
+import { FirestoreMemberRepository } from "../interfaces/FirestoreMemberRepository.js";
 import { InMemoryMemberRepository } from "../interfaces/InMemoryMemberRepository.js";
-import { AuthService } from "../commands/auth.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -17,13 +22,23 @@ const client = new Client({
   ],
 });
 
-const memberRepository = InMemoryMemberRepository.getInstance(client);
+let memberRepository;
+let environment: string;
+
+if (process.env.NODE_ENV === "production") {
+  memberRepository = new FirestoreMemberRepository(client);
+  environment = "本番モード";
+} else {
+  memberRepository = InMemoryMemberRepository.getInstance(client);
+  environment = "テストモード";
+}
+
 const authUseCase = new AuthenticationUseCase(memberRepository);
-const authService = new AuthService(memberRepository);
 
 client.on("ready", () => {
   if (client.user) {
     console.log(`Logged in as ${client.user.tag}!`);
+    client.user.setActivity(environment, { type: ActivityType.Watching });
   } else {
     console.log("Client is ready, but the user detail is not available.");
   }
@@ -38,7 +53,6 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("guildMemberAdd", async (member) => {
   console.log(`New member added: ${member.user.tag}`);
-  await authService.addUnauthorizedRole(member);
   await authUseCase.handleNewMember(member.id);
   console.log(`Sent a welcome message to ${member.user.tag}.`);
 });

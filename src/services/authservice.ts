@@ -1,4 +1,3 @@
-// src/authService.js
 import { auth } from "../config/firebaseConfig.js";
 import { sendSignInLinkToEmail } from "firebase/auth";
 
