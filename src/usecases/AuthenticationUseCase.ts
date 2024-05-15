@@ -1,6 +1,6 @@
 import { Member } from "../entities/Member.js";
 import { MemberRepository } from "../interfaces/MemberRepository.js";
-import { sendAuthenticationLink } from "../services/authservice.js";
+import { sendAuthenticationLink } from "../services/authService.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -16,7 +16,7 @@ export class AuthenticationUseCase {
     await this.memberRepository.save(member);
     await this.memberRepository.sendMessage(
       id,
-      "メールアドレスを登録して認証を完了してください。"
+      "静大メールアドレスを登録して認証を完了してください。"
     );
   }
   async handleEmailResponse(memberId: string, email: string): Promise<void> {
@@ -40,7 +40,7 @@ export class AuthenticationUseCase {
     } else {
       await this.memberRepository.sendMessage(
         memberId,
-        "Please provide a valid Shizuoka University email address."
+        "静大メールアドレスを入力してください。"
       );
     }
   }
