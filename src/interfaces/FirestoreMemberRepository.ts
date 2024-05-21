@@ -23,6 +23,8 @@ export class FirestoreMemberRepository implements MemberRepository {
   }
 
   async findById(id: string): Promise<Member | null> {
+    const memberDocRef = doc(this.collectionRef, id);
+    console.log("Fetching document with path:", memberDocRef.path); // デバッグ用ログ
     const memberDoc = await getDoc(doc(this.collectionRef, id));
     if (memberDoc.exists()) {
       const data = memberDoc.data();
@@ -43,12 +45,14 @@ export class FirestoreMemberRepository implements MemberRepository {
 
   async save(member: Member): Promise<void> {
     console.log(`Attempting to save member with ID: ${member.getId()}`);
+    const memberData = {
+      id: member.getId(),
+      email: member.getEmail(),
+      isAuthorised: member.isAuthorised(),
+    };
+    console.log("Member Data:", memberData); // デバッグ用ログ
     try {
-      await setDoc(doc(this.collectionRef, member.getId()), {
-        id: member.getId(),
-        email: member.getEmail(),
-        isAuthorised: member.isAuthorised(),
-      });
+      await setDoc(doc(this.collectionRef, member.getId()), memberData);
       console.log(`Member ${member.getId()} saved.`);
     } catch (error) {
       console.error(`Failed to save member ${member.getId()}: ${error}`);
