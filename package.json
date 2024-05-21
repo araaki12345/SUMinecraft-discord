@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "node dist/frameworks/bot.js",
-    "dev": "ts-node src/frameworks/bot.ts"
+    "dev": "ts-node src/frameworks/testFirebase.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
     "@types/node": "^20.12.12",
     "eslint": "^9.1.1",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.5"
   },
   "dependencies": {

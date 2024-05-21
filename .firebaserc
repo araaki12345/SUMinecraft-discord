@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "suminecraftbot"
-  }
+    "default": "suminecraft-a8147",
+    "staging": "suminecraft-a8147"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
