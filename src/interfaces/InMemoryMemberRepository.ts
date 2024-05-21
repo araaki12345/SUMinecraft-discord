@@ -3,7 +3,7 @@ import { Member } from "../entities/Member";
 import { MemberRepository } from "./MemberRepository.js";
 
 export class InMemoryMemberRepository implements MemberRepository {
-  private static instance: InMemoryMemberRepository;
+  private static instance: InMemoryMemberRepository | null = null;
   private client: Client;
   private members: Member[] = [];
 
@@ -20,25 +20,28 @@ export class InMemoryMemberRepository implements MemberRepository {
 
   async findById(id: string): Promise<Member | null> {
     console.log(`Searching for member with ID: ${id}`);
-    const member = this.members.find((member) => member.id === id);
+    const member = this.members.find((member) => member.getId() === id);
     if (!member) {
       console.log("Member not found.");
     } else {
-      console.log(`Member found: ${member.id}`);
+      console.log(`Member found: ${member.getId()}`);
     }
     return member || null;
   }
 
   async save(member: Member): Promise<void> {
-    const existingIndex = this.members.findIndex((m) => m.id === member.id);
+    const existingIndex = this.members.findIndex(
+      (m) => m.getId() === member.getId()
+    );
     if (existingIndex !== -1) {
       this.members[existingIndex] = member;
     } else {
       this.members.push(member);
     }
   }
+
   async update(member: Member): Promise<void> {
-    const index = this.members.findIndex((m) => m.id === member.id);
+    const index = this.members.findIndex((m) => m.getId() === member.getId());
     if (index !== -1) {
       this.members[index] = member;
     } else {
@@ -46,13 +49,14 @@ export class InMemoryMemberRepository implements MemberRepository {
     }
   }
 
-  async delete(member: Member): Promise<void> {
-    this.members = this.members.filter((m) => m.id !== member.id);
+  async delete(id: string): Promise<void> {
+    this.members = this.members.filter((m) => m.getId() !== id);
   }
 
   async findByEmail(email: string): Promise<Member | null> {
-    return this.members.find((member) => member.email === email) || null;
+    return this.members.find((member) => member.getEmail() === email) || null;
   }
+
   async sendMessage(memberId: string, message: string): Promise<void> {
     try {
       const user = await this.client.users.fetch(memberId);

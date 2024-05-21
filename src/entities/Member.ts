@@ -1,20 +1,31 @@
 export class Member {
-  id: string;
-  name: string;
-  email: string;
-  isAuthorised: boolean;
+  private id: string;
+  private email: string;
+  private authorised: boolean;
 
-  constructor(id: string, name: string) {
+  constructor(id: string, email: string, authorised: boolean = false) {
     this.id = id;
-    this.name = name;
-    this.email = "";
-    this.isAuthorised = false;
+    this.email = email;
+    this.authorised = authorised;
   }
 
-  authorise() {
-    this.isAuthorised = true;
+  public authorise() {
+    this.authorised = true;
   }
-  setEmail(newEmail: string) {
-    this.email = newEmail;
+
+  public setEmail(email: string) {
+    this.email = email;
+  }
+
+  public getId() {
+    return this.id;
+  }
+
+  public getEmail() {
+    return this.email;
+  }
+
+  public isAuthorised(): boolean {
+    return this.authorised;
   }
 }

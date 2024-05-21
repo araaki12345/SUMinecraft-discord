@@ -1,6 +1,5 @@
 import { MemberRepository } from "../interfaces/MemberRepository.js";
 import { Member } from "../entities/Member.js";
-import { reauthenticateWithCredential } from "firebase/auth";
 
 export class AuthService {
   private memberRepository: MemberRepository;
@@ -17,7 +16,7 @@ export class AuthService {
       newMember.authorise();
       await this.memberRepository.save(newMember);
       return "Member was not found, created and authorised.";
-    } else if (!member.isAuthorised) {
+    } else if (!member.isAuthorised()) {
       // 既存のメンバーが未認証の場合は認証
       member.authorise();
       await this.memberRepository.update(member);
@@ -29,7 +28,7 @@ export class AuthService {
   }
   async grantAuthorisedRole(userId: string, guild: any) {
     const member = await this.memberRepository.findById(userId);
-    if (member && member.isAuthorised) {
+    if (member && member.isAuthorised()) {
       let authorisedRole = guild.roles.cache.find(
         (role: any) => role.name === "認証済"
       );
