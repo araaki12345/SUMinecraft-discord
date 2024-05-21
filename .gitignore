@@ -1,3 +1,12 @@
 node_modules/
 .env
 dist/
+suminecraft-*.json
+*.txt
+public/
+.firebase/
+.github/
+firebase-export-metadata.json
+accounts.json
+config.json
+firestore_export.overall_export_metadata
