@@ -1,6 +1,6 @@
 import { Member } from "../entities/Member.js";
 import { MemberRepository } from "../interfaces/MemberRepository.js";
-import { sendAuthenticationLink } from "../services/authService.js";
+import { sendAuthenticationLink } from "../services/authservice.js";
 import dotenv from "dotenv";
 
 dotenv.config();
