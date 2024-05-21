@@ -29,7 +29,6 @@ export class AuthenticationUseCase {
         const redirectUrl = process.env.FIREBASE_REDIRECT_URL;
         if (!redirectUrl) {
           throw new Error("Redirect URL is not set.");
-          return;
         }
         await sendAuthenticationLink(email);
         await this.memberRepository.sendMessage(
