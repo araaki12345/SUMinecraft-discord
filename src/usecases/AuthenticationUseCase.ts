@@ -31,7 +31,7 @@ export class AuthenticationUseCase {
           throw new Error("Redirect URL is not set.");
           return;
         }
-        await sendAuthenticationLink(email, redirectUrl);
+        await sendAuthenticationLink(email);
         await this.memberRepository.sendMessage(
           memberId,
           "認証リンクをメールに送信しました。メールを確認してください。"
