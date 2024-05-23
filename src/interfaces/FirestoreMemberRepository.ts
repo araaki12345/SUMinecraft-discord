@@ -44,13 +44,11 @@ export class FirestoreMemberRepository implements MemberRepository {
   }
 
   async save(member: Member): Promise<void> {
-    console.log(`Attempting to save member with ID: ${member.getId()}`);
     const memberData = {
       id: member.getId(),
       email: member.getEmail(),
       isAuthorised: member.isAuthorised(),
     };
-    console.log("Member Data:", memberData); // デバッグ用ログ
     try {
       await setDoc(doc(this.collectionRef, member.getId()), memberData);
       console.log(`Member ${member.getId()} saved.`);
