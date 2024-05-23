@@ -8,6 +8,7 @@ import { AuthenticationUseCase } from "../usecases/AuthenticationUseCase.js";
 import { handleAuthCommand } from "../commands/authCommandHandler.js";
 import { FirestoreMemberRepository } from "../interfaces/FirestoreMemberRepository.js";
 import { InMemoryMemberRepository } from "../interfaces/InMemoryMemberRepository.js";
+import { AuthService } from "../commands/auth.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -21,7 +22,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent, // メッセージ内容を受信するためにはこのインテントが必要
+    GatewayIntentBits.MessageContent,
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.GuildMembers,
   ],
@@ -39,6 +40,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const authUseCase = new AuthenticationUseCase(memberRepository);
+const authService = new AuthService(memberRepository);
 
 client.on("ready", () => {
   if (client.user) {
@@ -51,14 +53,13 @@ client.on("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
-  if (interaction.commandName === "auth") {
-    await handleAuthCommand(interaction, memberRepository);
-  }
+  await handleAuthCommand(interaction, memberRepository);
 });
 
 client.on("guildMemberAdd", async (member) => {
   console.log(`New member added: ${member.user.tag}`);
   await authUseCase.handleNewMember(member.id);
+  await authService.addUnauthorizedRole(member);
   console.log(`Sent a welcome message to ${member.user.tag}.`);
 });
 
