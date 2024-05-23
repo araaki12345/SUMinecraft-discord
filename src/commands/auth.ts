@@ -1,5 +1,6 @@
 import { MemberRepository } from "../interfaces/MemberRepository.js";
 import { Member } from "../entities/Member.js";
+import { admin } from "../config/firebaseAdminConfig.js";
 
 async function handleRoleModification(
   operation: Promise<any>,
@@ -7,10 +8,12 @@ async function handleRoleModification(
   errorMessage: string
 ) {
   try {
-    await operation;
+    const result = await operation;
     console.log(successMessage);
+    return result;
   } catch (error) {
     console.error(errorMessage, error);
+    throw error;
   }
 }
 export class AuthService {
@@ -41,6 +44,7 @@ export class AuthService {
   async grantAuthorisedRole(userId: string, guild: any) {
     const member = await this.memberRepository.findById(userId);
     if (member && member.isAuthorised()) {
+      console.log(`Member with ID ${userId} is authorised, granting role.`);
       let authorisedRole = guild.roles.cache.find(
         (role: any) => role.name === "認証済"
       );
@@ -65,6 +69,7 @@ export class AuthService {
           "認証済ロールを${guildMember.user.tag}に付与できませんでした。"
         );
       }
+
       const unauthorizedRole = guild.roles.cache.find(
         (role: any) => role.name === "未認証"
       );
@@ -106,6 +111,35 @@ export class AuthService {
       );
     } else {
       console.log("未認証ロールの付与に失敗しました。");
+    }
+  }
+
+  async verifyUserAndAuthorize(
+    userEmail: string,
+    userId: string,
+    guild: any
+  ): Promise<string> {
+    try {
+      const userRecord = await admin.auth().getUserByEmail(userEmail);
+
+      if (userRecord.emailVerified) {
+        console.log(`Email ${userEmail} is verified.`);
+        const member = await this.memberRepository.findById(userId);
+        if (member) {
+          member.authorise();
+          await this.memberRepository.update(member);
+          await this.grantAuthorisedRole(userId, guild);
+          return "ユーザーを認証しました！";
+        } else {
+          return "認証に失敗しました。";
+        }
+      } else {
+        console.log(`Email ${userEmail} is not verified.`);
+        return "メールアドレスが認証されていません。";
+      }
+    } catch (error) {
+      console.error("Error verifying user:", error);
+      return "エラーが発生しました。";
     }
   }
 }
