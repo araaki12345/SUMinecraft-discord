@@ -28,7 +28,12 @@ export class FirestoreMemberRepository implements MemberRepository {
     const memberDoc = await getDoc(doc(this.collectionRef, id));
     if (memberDoc.exists()) {
       const data = memberDoc.data();
-      return new Member(data.id, data.email, data.isAuthorised); // Remove data.name argument
+      return new Member(
+        data.id,
+        data.email,
+        data.minecraftUsername,
+        data.isAuthorised
+      );
     }
     return null;
   }
@@ -38,7 +43,12 @@ export class FirestoreMemberRepository implements MemberRepository {
     if (querySnapshot.empty) {
       const doc = querySnapshot.docs[0];
       const data = doc.data();
-      return new Member(data.id, data.email, data.isAuthorised);
+      return new Member(
+        data.id,
+        data.email,
+        data.minecraftUsername,
+        data.isAuthorised
+      );
     }
     return null;
   }
@@ -47,6 +57,7 @@ export class FirestoreMemberRepository implements MemberRepository {
     const memberData = {
       id: member.getId(),
       email: member.getEmail(),
+      minecraftUsername: member.getMinecraftUsername(),
       isAuthorised: member.isAuthorised(),
     };
     try {
@@ -74,6 +85,7 @@ export class FirestoreMemberRepository implements MemberRepository {
     try {
       await updateDoc(doc(this.collectionRef, member.getId()), {
         email: member.getEmail(),
+        minecraftUsername: member.getMinecraftUsername(),
         isAuthorised: member.isAuthorised(),
       });
       console.log(`Member ${member.getId()} updated.`);

@@ -30,10 +30,18 @@ export async function handleAuthCommand(
         interaction.guild
       );
 
-      await interaction.reply(result);
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply(result);
+      } else {
+        await interaction.followUp(result);
+      }
     } catch (error) {
       console.error("Error fetching user data:", error);
-      await interaction.reply("エラーが発生しました。");
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply("エラーが発生しました。");
+      } else {
+        await interaction.followUp("エラーが発生しました。");
+      }
     }
   }
 }

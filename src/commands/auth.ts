@@ -27,7 +27,7 @@ export class AuthService {
     const member = await this.memberRepository.findById(id);
     if (!member) {
       // メンバーが見つからない場合は新規作成と認証
-      const newMember = new Member(id, "Unknown");
+      const newMember = new Member(id, "", "", false);
       newMember.authorise();
       await this.memberRepository.save(newMember);
       return "Member was not found, created and authorised.";
