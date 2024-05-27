@@ -53,7 +53,16 @@ client.on("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
-  await handleAuthCommand(interaction, memberRepository);
+  try {
+    await handleAuthCommand(interaction, memberRepository);
+  } catch (error) {
+    console.error("Error handling interaction:", error);
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp("エラーが発生しました。");
+    } else {
+      await interaction.reply("エラーが発生しました。");
+    }
+  }
 });
 
 client.on("guildMemberAdd", async (member) => {
@@ -74,9 +83,17 @@ client.on("messageCreate", async (message) => {
   if (!message.guild && message.channel.type === ChannelType.DM) {
     const emailRegex = /[\w.-]+@shizuoka\.ac\.jp$/i; // メールアドレスの正規表現
     const emailMatch = message.content.match(emailRegex);
+    const member = await memberRepository.findById(message.author.id);
+
     if (emailMatch) {
       console.log(`Received email: ${emailMatch[0]}`);
       await authUseCase.handleEmailResponse(message.author.id, emailMatch[0]);
+    } else if (member && member.getEmail()) {
+      console.log(`Received username: ${message.content}`);
+      await authUseCase.handleMinecraftUsernameResponse(
+        message.author.id,
+        message.content
+      );
     } else {
       console.log("Received invalid or no email address.");
       await message.reply("有効な静岡大学のメールアドレスを入力してください。");
